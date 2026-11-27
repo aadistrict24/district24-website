@@ -1,20 +1,35 @@
 {
   "name": "district24-website",
   "version": "1.0.0",
-  "description": "Choose a self-explaining name for your project.",
-  "main": "index.js",
+  "private": true,
+  "description": "Website for AA District 24 (Ozaukee County, Area 75), built with Astro.",
+  "type": "module",
   "scripts": {
-    "build": "esbuild src/main.jsx --bundle --outfile=js/index.compiled.js --jsx-factory=React.createElement --jsx-fragment=React.Fragment --minify",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro preview",
+    "check": "astro check"
   },
   "repository": {
     "type": "git",
-    "url": "git@github-mike.com:mike-mke/district24-website.git"
+    "url": "https://github.com/aadistrict24/district24-website.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "dependencies": {
+    "@astrojs/react": "^7.1.9",
+    "astro": "^7.4.13",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
   "devDependencies": {
-    "esbuild": "^0.24.0"
+    "@astrojs/check": "^0.9.12",
+    "@types/react": "^19.3.3",
+    "@types/react-dom": "^19.3.0",
+    "typescript": "^6.0.3"
   }
 }

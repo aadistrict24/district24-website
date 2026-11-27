@@ -1,0 +1,47 @@
+---
+import '../styles/global.css';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  /** Page-specific title; rendered as "<title> | AA District 24". Omit on the home page. */
+  title?: string;
+  description?: string;
+}
+
+const SITE_NAME = 'AA District 24 – Ozaukee County';
+const {
+  title,
+  description = 'AA District 24 (Ozaukee County), part of Area 75 Southern Wisconsin: meetings, events, workshops, and service resources for Alcoholics Anonymous.',
+} = Astro.props;
+const fullTitle = title ? `${title} | AA District 24` : SITE_NAME;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <script is:inline>
+      // The old site used hash routes like "/#/cpc". Send those to the real page.
+      if (location.hash.startsWith('#/')) {
+        location.replace(location.hash.slice(1) || '/');
+      }
+    </script>
+  </head>
+  <body>
+    <div id="app">
+      <Navbar />
+      <main><slot /></main>
+      <Footer />
+    </div>
+  </body>
+</html>
