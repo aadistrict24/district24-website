@@ -48,7 +48,8 @@ npm run preview
 ```
 
 ## Deploys (Netlify)
-The site is hosted on [Netlify](https://www.netlify.com/), configured by `netlify.toml`:
+The site is hosted on [Netlify](https://www.netlify.com/) (project dashboard:
+https://app.netlify.com/projects/aadistrict24), configured by `netlify.toml`:
 
 - **Production**: every merge/push to `main` builds and deploys automatically.
 - **Deploy Previews**: every pull request gets its own preview URL, posted as a comment/check on the PR. Use it to
