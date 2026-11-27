@@ -1,8 +1,8 @@
 #!/bin/bash
 # Usage:
-#   ./build.sh               — build only
+#   ./build.sh build         — build only
 #   ./build.sh local         — build + deploy to local nginx at /usr/local/nginx/html/
-#   ./build.sh docker        — build Docker image + run at http://localhost:8080
+#   ./build.sh docker        — build Docker image + run at http://localhost:$LOCAL_PORT
 #   ./build.sh aws           — build + deploy to AWS Amplify
 
 set -e
@@ -33,36 +33,26 @@ usage() {
 # ── Build ────────────────────────────────────────────────────────────
 function app_build() {
     rm -rf build
-    mkdir -p build
     rm -rf dist
-    mkdir -p dist
 
-    # Bundles every component under src/ (pages, shared components, data,
-    # utils) into a single compiled file. React/ReactDOM stay on the CDN
-    # (see index.html), so JSX compiles to React.createElement calls
-    # rather than bundling React itself.
-    npx esbuild src/main.jsx --bundle --outfile=js/index.compiled.js \
-        --jsx-factory=React.createElement --jsx-fragment=React.Fragment --minify
-    chmod 644 js/index.compiled.js
+    # Astro type-checks the project, then pre-renders every page in
+    # src/pages/ to static HTML in dist/ (see astro.config.mjs).
+    npm run build
 
-    cp -a index.html build/
-    cp -a css build/
-    mkdir -p build/js
-    cp -a js/index.compiled.js build/js/
-    chmod 644 build/js/index.compiled.js
+    # build/ mirrors dist/ for the local nginx deploy target.
+    cp -a dist build
 }
 # ── Package ───────────────────────────────────────────────────────────────────
 function app_package() {
-    [[ ! -d "dist" ]] && { echo "Creating dist/"; mkdir dist; }
-    [[ -f "dist/district24.zip" ]] && { echo "Removing old zip"; rm dist/*.zip; }
-    zip -r dist/district24.zip css js index.html -x "*.DS_Store"
+    [[ -f "district24.zip" ]] && { echo "Removing old zip"; rm district24.zip; }
+    (cd dist && zip -r ../district24.zip . -x "*.DS_Store")
+    mv district24.zip dist/
 }
 
 # ── Deploy targets ────────────────────────────────────────────────────────────
 function cmd_local() {
-    cp -a build/. /usr/local/nginx/html/
-    chmod 644 /usr/local/nginx/html/js/index.compiled.js
-    echo "Deployed to local nginx"
+    cp -a build/. "$NGINX_HTML"/
+    echo "Deployed to local nginx at $NGINX_HTML"
 }
 
 function cmd_docker() {

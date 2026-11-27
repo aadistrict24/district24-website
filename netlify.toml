@@ -1,0 +1,9 @@
+# Netlify build configuration.
+# Production deploys run on every push to `main`; every pull request gets a
+# Deploy Preview, and other branches get branch deploys.
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"

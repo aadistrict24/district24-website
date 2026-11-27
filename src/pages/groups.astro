@@ -1,0 +1,16 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import MeetingsFilter from '../components/islands/MeetingsFilter';
+import { ALL_MEETINGS, DAYS_ORDER, MEETING_CODES } from '../data';
+---
+<BaseLayout
+  title="All Groups in District 24"
+  description="Search every A.A. meeting in District 24 (Ozaukee County) by day, name, or location, including online meetings."
+>
+  <div class="page">
+    <h1 class="page-h1">All Groups in District 24</h1>
+    <MeetingsFilter client:load meetings={ALL_MEETINGS} codes={MEETING_CODES} daysOrder={DAYS_ORDER} />
+    <br />
+    <span class="text-navy bold italic">Open District 24 <a target="_blank" href="https://drive.google.com/file/d/1qmuSAf2tNNXkwAtQ-qxsV0cCPpA1RYBw/view">'When and Where'</a></span>
+  </div>
+</BaseLayout>

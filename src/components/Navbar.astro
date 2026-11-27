@@ -1,0 +1,88 @@
+---
+import { NAV_PAGES, NAV_GROUPS, type NavItem } from '../data';
+
+// Normalise "/cpc/" and "/cpc" to the same value so active states match.
+const current = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const isCurrent = (item: NavItem) => item.href === current;
+
+const dropdowns: { label: string; items: NavItem[] }[] = [
+  { label: 'Pages', items: NAV_PAGES.slice(1) },
+  { label: 'Groups', items: NAV_GROUPS },
+];
+---
+<nav class="navbar">
+  <div class="navbar__inner">
+    <a href="/" class="navbar__brand">
+      <span class="navbar__brand-name">AA District 24</span>
+      <span class="navbar__brand-sub">Ozaukee County · Area 75</span>
+    </a>
+    <div class="navbar__links">
+      <a href="/" class:list={['nav-link', { active: current === '/' }]}>Home</a>
+      {dropdowns.map(({ label, items }) => (
+        <div class="dropdown" data-dropdown>
+          <button
+            type="button"
+            class:list={['dropdown__btn', { active: items.some(isCurrent) }]}
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            {label} <span class="dropdown__caret">▾</span>
+          </button>
+          <div class="dropdown__menu" hidden>
+            {items.map((item) => (
+              <a href={item.href} class:list={['dropdown__item', { active: isCurrent(item) }]}>{item.label}</a>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+    <button type="button" class="hamburger" aria-label="Menu" aria-expanded="false" aria-controls="mobile-menu" data-hamburger>
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="mobile-menu" id="mobile-menu" hidden>
+    {NAV_PAGES.map((item) => (
+      <a href={item.href} class:list={['mobile-link', { active: isCurrent(item) }]}>{item.label}</a>
+    ))}
+    <div class="mobile-section">Groups</div>
+    {NAV_GROUPS.map((item) => (
+      <a href={item.href} class:list={['mobile-link', 'mobile-sub', { active: isCurrent(item) }]}>{item.label}</a>
+    ))}
+  </div>
+</nav>
+
+<script>
+  // Dropdowns open on hover (desktop) or click, and close on an outside click.
+  document.querySelectorAll<HTMLElement>('[data-dropdown]').forEach((dropdown) => {
+    const button = dropdown.querySelector<HTMLButtonElement>('.dropdown__btn')!;
+    const menu = dropdown.querySelector<HTMLElement>('.dropdown__menu')!;
+    const isOpen = () => !menu.hasAttribute('hidden');
+    const setOpen = (open: boolean) => {
+      menu.toggleAttribute('hidden', !open);
+      button.setAttribute('aria-expanded', String(open));
+    };
+    // A click right after hover opened the menu (or a tap, which fires mouseenter
+    // first) should keep it open rather than toggling it closed again.
+    let openedByHover = false;
+    dropdown.addEventListener('mouseenter', () => {
+      openedByHover = !isOpen();
+      setOpen(true);
+    });
+    dropdown.addEventListener('mouseleave', () => setOpen(false));
+    button.addEventListener('click', () => {
+      setOpen(openedByHover || !isOpen());
+      openedByHover = false;
+    });
+    document.addEventListener('mousedown', (e) => {
+      if (!dropdown.contains(e.target as Node)) setOpen(false);
+    });
+  });
+
+  const hamburger = document.querySelector<HTMLButtonElement>('[data-hamburger]');
+  const mobileMenu = document.getElementById('mobile-menu');
+  hamburger?.addEventListener('click', () => {
+    if (!mobileMenu) return;
+    const open = mobileMenu.toggleAttribute('hidden');
+    hamburger.setAttribute('aria-expanded', String(!open));
+  });
+</script>
